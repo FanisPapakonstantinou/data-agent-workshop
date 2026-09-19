@@ -1,0 +1,11 @@
+smolagents==1.26.0
+litellm
+duckdb
+pandas
+tabulate
+ipywidgets
+ipython
+markdown-it-py
+pygments
+sqlparse
+jupyterlab
