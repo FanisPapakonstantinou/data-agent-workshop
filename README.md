@@ -4,7 +4,6 @@ This workshop builds a small SQL data agent over an included DuckDB database. It
 
 ## TODO
 
-- Make sure the model setup works fine with whatever model they will have access to in sagemaker
 - Find interesting questions to show non-determinism and fix after the human data context.
 
 
@@ -14,9 +13,10 @@ This workshop builds a small SQL data agent over an included DuckDB database. It
 - `worldcup-2026.duckdb` — the read-only workshop database
 - `agent.py` — a small `smolagents` wrapper used by the notebook
 - `notebook_ui.py` — notebook trace rendering used by the workshop
+- `provider.py` — model and credential selection used by the notebook
 - `requirements.txt` — Python dependencies
 
-Keep the notebook, database, and both Python modules in the same directory.
+Keep the notebook, database, and all three Python modules in the same directory.
 
 ## Run locally
 
@@ -31,11 +31,36 @@ jupyter lab
 
 Open `world_cup_data_agent_workshop_final.ipynb` and run its cells in order.
 
-When prompted, enter your own OpenAI API key. The prompt uses `getpass`, so the key is not displayed or saved in the notebook. You may instead set `OPENAI_API_KEY` in your environment before starting Jupyter. Never commit an API key or `.env` file.
+When prompted, enter your own API key. The prompt uses `getpass`, so the key is not displayed or saved in the notebook. Never commit an API key or `.env` file.
+
+## Choosing a provider
+
+`provider.py` reads credentials from the environment, so switching provider needs no code change.
+
+| Provider | Environment variables |
+| --- | --- |
+| OpenAI (default) | `OPENAI_API_KEY` |
+| Amazon Bedrock | `PROVIDER=bedrock`, plus either `AWS_BEARER_TOKEN_BEDROCK` (a Bedrock API key) or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` |
+
+For Bedrock, set `AWS_REGION_NAME` if you are not in `us-east-1`, and set `MODEL_ID` to a model enabled in your account — check the Bedrock console for the exact id, since it varies by region and account.
+
+```bash
+export PROVIDER=bedrock
+export AWS_BEARER_TOKEN_BEDROCK=...
+export MODEL_ID=bedrock/anthropic.claude-sonnet-5
+```
 
 ## Google Colab
 
-Upload the notebook, `worldcup-2026.duckdb`, `agent.py`, and `notebook_ui.py` into the same Colab session. Run the notebook cells in order and enter your API key only when prompted.
+Upload the notebook, `worldcup-2026.duckdb`, `agent.py`, `notebook_ui.py`, and `provider.py` into the same Colab session. Run the notebook cells in order and enter your API key only when prompted.
+
+Colab secrets are not environment variables — the notebook will still prompt unless you copy the secret across first:
+
+```python
+import os
+from google.colab import userdata
+os.environ["OPENAI_API_KEY"] = userdata.get("OPENAI_API_KEY")
+```
 
 ## Data
 
