@@ -33,6 +33,18 @@ def _ensure_credentials(provider: str) -> None:
         os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API key: ")
 
 
+def _detect_provider() -> str:
+    """Resolve the provider, asking rather than defaulting to one silently."""
+    configured = os.environ.get("PROVIDER")
+    if configured:
+        return configured.strip().lower()
+    if os.environ.get("AWS_BEARER_TOKEN_BEDROCK") or os.environ.get("AWS_ACCESS_KEY_ID"):
+        return "bedrock"
+    if os.environ.get("OPENAI_API_KEY"):
+        return "openai"
+    return input(f"Provider ({' or '.join(_PROVIDERS)}): ").strip().lower()
+
+
 def build_model(model_id: str | None = None, provider: str | None = None, **kwargs) -> LiteLLMModel:
     """Build a LiteLLM model, reading credentials from the environment.
 
@@ -41,7 +53,7 @@ def build_model(model_id: str | None = None, provider: str | None = None, **kwar
         provider: "openai" or "bedrock". Defaults to the PROVIDER variable.
         kwargs: Passed through to LiteLLMModel.
     """
-    provider = provider or os.environ.get("PROVIDER", "openai")
+    provider = provider or _detect_provider()
     if provider not in _PROVIDERS:
         raise ValueError(f"Unknown provider {provider!r}. Choose one of: {', '.join(_PROVIDERS)}")
 

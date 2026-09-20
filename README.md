@@ -39,8 +39,10 @@ When prompted, enter your own API key. The prompt uses `getpass`, so the key is 
 
 | Provider | Environment variables |
 | --- | --- |
-| OpenAI (default) | `OPENAI_API_KEY` |
-| Amazon Bedrock | `PROVIDER=bedrock`, plus either `AWS_BEARER_TOKEN_BEDROCK` (a Bedrock API key) or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` |
+| OpenAI | `OPENAI_API_KEY` |
+| Amazon Bedrock | either `AWS_BEARER_TOKEN_BEDROCK` (a Bedrock API key) or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` |
+
+`PROVIDER` selects the provider explicitly. Without it, whichever credentials are already in the environment decide; if none are, the notebook asks which provider you are using before requesting a key.
 
 For Bedrock, set `AWS_REGION_NAME` if you are not in `us-east-1`, and set `MODEL_ID` to a model enabled in your account — check the Bedrock console for the exact id, since it varies by region and account.
 
