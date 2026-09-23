@@ -10,7 +10,7 @@ for the first delivery.
 - Region: `eu-north-1`
 - Python: 3.11 or 3.12
 - Kernel shown to participants: **Data Agent Workshop**
-- Bedrock model: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0`
+- LiteLLM model ID: `bedrock/eu.anthropic.claude-sonnet-4-5-20250929-v1:0`
 - Data: keep `worldcup-2026.duckdb` in the repository
 
 The database is about 5.8 MB. Keeping it with the notebook removes an S3
@@ -22,9 +22,17 @@ download and permissions dependency from every participant session.
    spaces in `eu-north-1`.
 2. Select and pin a SageMaker Distribution image that provides Python 3.11 or
    3.12. Use the same image for the rehearsal and the workshop.
-3. Clone a tagged workshop release into each participant environment. Avoid
-   using a moving branch on workshop day.
-4. From a terminal in the repository, run:
+3. Clone the repository and check out the release tag selected for the
+   workshop. Replace `<release-tag>` with the tag agreed for the delivery:
+
+   ```bash
+   git clone https://github.com/FanisPapakonstantinou/data-agent-workshop.git
+   cd data-agent-workshop
+   git switch --detach <release-tag>
+   ```
+
+   Avoid using a moving branch on workshop day.
+4. From the same terminal, run:
 
    ```bash
    bash scripts/setup_sagemaker.sh
@@ -38,6 +46,18 @@ download and permissions dependency from every participant session.
 The setup script is idempotent. It reinstalls dependencies only when
 `requirements.lock.txt` changes, registers the kernel, and runs an offline
 smoke test against the bundled database.
+
+### Test the open pull request
+
+Before the release tag exists, use these exact commands to test PR #2:
+
+```bash
+git clone https://github.com/FanisPapakonstantinou/data-agent-workshop.git
+cd data-agent-workshop
+git fetch origin pull/2/head:sagemaker-workshop-setup
+git switch sagemaker-workshop-setup
+bash scripts/setup_sagemaker.sh
+```
 
 ## Optional lifecycle configuration
 
