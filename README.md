@@ -1,24 +1,57 @@
-# World Cup data-agent workshop
+# World Cup Data-Agent Workshop
 
-This workshop builds a small SQL data agent over an included DuckDB database. It demonstrates how schema inspection, business rules, and a lightweight evaluation improve an agent's answers.
+This workshop teaches participants to build and improve a SQL data agent over a supplied DuckDB database.
 
-## These are improvements need to be made! 
+Participants start with a basic agent and progressively add schema inspection, business rules, and executable evaluations to improve answer quality.
 
-- Make sure this works well in Bedrock.
-- Tune suggested questions / flow of workshop / Eval scenarios
+## Target environment
 
+The workshop will run in **Amazon SageMaker JupyterLab** using **Amazon Bedrock models**.
+
+SageMaker JupyterLab is required because the workshop uses:
+
+- Local Python modules
+- A local DuckDB database
+- Interactive notebook input
+- Custom HTML rendering for agent traces
+
+## Work before delivery
+
+### Bedrock support
+
+- Ensure model calling is fine through Bedrock. 
+- Select and use a Bedrock model for the workshop. 
+
+### SageMaker environment
+Look into these: 
+ - SageMaker Docker image with dependencies preinstalled.
+ - SageMaker lifecycle configuration that installs dependencies at startup.
+
+The notebook’s `%pip install` cell should remain only as a fallback.
+
+### Workshop content
+
+- Improve the progression of suggested questions.
+- Make sure the flow works well with one of the bedrock models. 
+- Add evaluation cases covering schema discovery, joins, aggregation, and business rules.
+- Validate expected answers and repeatability with the selected Bedrock model.
+
+## Workshop-ready criteria
+
+The workshop is ready when:
+- A fresh SageMaker JupyterLab environment runs without manual setup.
+- All required files are available automatically.
 
 ## Included files
-
-- `world_cup_data_agent_workshop_final.ipynb` — the workshop notebook
-- `worldcup-2026.duckdb` — the read-only workshop database
-- `agent.py` — a small `smolagents` wrapper used by the notebook
-- `notebook_ui.py` — notebook trace rendering used by the workshop
+- `world_cup_data_agent_workshop_final.ipynb` — workshop notebook
+- `worldcup-2026.duckdb` — read-only workshop database
+- `agent.py` — `smolagents` wrapper
+- `notebook_ui.py` — agent trace renderer
 - `requirements.txt` — Python dependencies
 
-Keep the notebook, database, and both Python modules in the same directory.
+Keep the notebook, database, and Python modules in the same directory.
 
-## Run locally
+## Local development
 
 Python 3.12 is recommended.
 
@@ -27,18 +60,3 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 jupyter lab
-```
-
-Open `world_cup_data_agent_workshop_final.ipynb` and run its cells in order.
-
-When prompted, enter your own OpenAI API key. The prompt uses `getpass`, so the key is not displayed or saved in the notebook. You may instead set `OPENAI_API_KEY` in your environment before starting Jupyter. Never commit an API key or `.env` file.
-
-## Google Colab
-
-Upload the notebook, `worldcup-2026.duckdb`, `agent.py`, and `notebook_ui.py` into the same Colab session. Run the notebook cells in order and enter your API key only when prompted.
-
-## Data
-
-The included DuckDB file contains 11 related tables for the 2026 World Cup workshop: matches, teams, players, goals, bookings, lineups, substitutions, referees, match referees, penalty shootouts, and tournaments.
-
-The database was derived from the [OpenFootball World Cup dataset](https://github.com/openfootball/worldcup.json), which is released under CC0 1.0/public domain. The provenance is also recorded in the database metadata.
