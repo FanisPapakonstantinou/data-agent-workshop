@@ -2,10 +2,10 @@
 
 This workshop builds a small SQL data agent over an included DuckDB database. It demonstrates how schema inspection, business rules, and a lightweight evaluation improve an agent's answers.
 
-## TODO
+## These are improvements need to be made! 
 
-- Make sure the model setup works fine with whatever model they will have access to in sagemaker
-- Find interesting questions to show non-determinism and fix after the human data context.
+- Make sure this works well in Bedrock.
+- Tune suggested questions / flow of workshop / Eval scenarios
 
 
 ## Included files
