@@ -22,16 +22,13 @@ download and permissions dependency from every participant session.
    spaces in `eu-north-1`.
 2. Select and pin a SageMaker Distribution image that provides Python 3.11 or
    3.12. Use the same image for the rehearsal and the workshop.
-3. Clone the repository and check out the release tag selected for the
-   workshop. Replace `<release-tag>` with the tag agreed for the delivery:
+3. Clone the repository. The workshop code is expected to be on the default
+   branch:
 
    ```bash
    git clone https://github.com/FanisPapakonstantinou/data-agent-workshop.git
    cd data-agent-workshop
-   git switch --detach <release-tag>
    ```
-
-   Avoid using a moving branch on workshop day.
 4. From the same terminal, run:
 
    ```bash
@@ -46,18 +43,6 @@ download and permissions dependency from every participant session.
 The setup script is idempotent. It reinstalls dependencies only when
 `requirements.lock.txt` changes, registers the kernel, and runs an offline
 smoke test against the bundled database.
-
-### Test the open pull request
-
-Before the release tag exists, use these exact commands to test PR #2:
-
-```bash
-git clone https://github.com/FanisPapakonstantinou/data-agent-workshop.git
-cd data-agent-workshop
-git fetch origin pull/2/head:sagemaker-workshop-setup
-git switch sagemaker-workshop-setup
-bash scripts/setup_sagemaker.sh
-```
 
 ## Optional lifecycle configuration
 
