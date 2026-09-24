@@ -9,6 +9,7 @@ The final_answer tool is internal framework protocol.
 Call it silently when the task is complete.
 Do not mention final_answer to the user.
 Do not mention or leak final_answer in reasoning summaries, thinking steps, or answers.
+Before each tool call, state in one short sentence what you are doing and why
 """.strip()
 
 

@@ -9,8 +9,7 @@ from smolagents import LiteLLMModel
 
 
 DEFAULT_REGION = "eu-north-1"
-DEFAULT_MODEL = "bedrock/eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
-
+DEFAULT_MODEL = "bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 def build_bedrock_model() -> LiteLLMModel:
     """Prompt for the workshop's Bedrock settings and build its model."""
@@ -27,4 +26,4 @@ def build_bedrock_model() -> LiteLLMModel:
     os.environ["AWS_REGION_NAME"] = region
 
     print("model:", model_id)
-    return LiteLLMModel(model_id=model_id, max_tokens=1200)
+    return LiteLLMModel(model_id=model_id, api_key=api_key, max_tokens=1200,  tool_choice="auto",  reasoning_effort="low")

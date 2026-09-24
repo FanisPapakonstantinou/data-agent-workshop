@@ -167,7 +167,7 @@ def _reasoning_summary(step) -> str:
         return str(reasoning).strip()
 
     provider_fields = getattr(raw_message, "provider_specific_fields", None) or {}
-    blocks = provider_fields.get("thinking_blocks", []) if isinstance(provider_fields, dict) else []
+    blocks = (provider_fields.get("thinking_blocks") or []) if isinstance(provider_fields, dict) else []
     block_text = []
     for block in blocks:
         text = block.get("thinking") if isinstance(block, dict) else getattr(block, "thinking", None)
