@@ -1,3 +1,5 @@
+"""Amazon Bedrock setup for the workshop notebook."""
+
 from __future__ import annotations
 
 import getpass
@@ -6,24 +8,22 @@ import os
 from smolagents import LiteLLMModel
 
 
-DEFAULT_MODEL = "anthropic/claude-haiku-4-5" 
-
+DEFAULT_REGION = "eu-north-1"
+DEFAULT_MODEL = "bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 def build_bedrock_model() -> LiteLLMModel:
-    """Prompt for the workshop's Anthropic key and build its model."""
-    # Clear Bedrock leftovers from the old cell (the kernel keeps env vars across cells)
-    os.environ.pop("AWS_BEARER_TOKEN_BEDROCK", None)
-    os.environ.pop("AWS_REGION_NAME", None)
-
+    """Prompt for the workshop's Bedrock settings and build its model."""
     api_key = getpass.getpass(
-        "Anthropic API key (input hidden; paste and press Enter): "
-    ).strip()
+        "Bedrock API key (input hidden; paste and press Enter): "
+    )
     if not api_key:
-        raise ValueError("An Anthropic API key is required.")
-    if not api_key.startswith("sk-ant-"):
-        print(f"warning: unusual key prefix {api_key[:8]!r}... (expected 'sk-ant-'), continuing anyway")
+        raise ValueError("A Bedrock API key is required.")
 
-    model_id = input(f"Model [{DEFAULT_MODEL}]: ").strip() or DEFAULT_MODEL
+    region = input(f"AWS region [{DEFAULT_REGION}]: ").strip() or DEFAULT_REGION
+    model_id = input(f"Bedrock model [{DEFAULT_MODEL}]: ").strip() or DEFAULT_MODEL
+
+    os.environ["AWS_BEARER_TOKEN_BEDROCK"] = api_key
+    os.environ["AWS_REGION_NAME"] = region
 
     print("model:", model_id)
     return LiteLLMModel(model_id=model_id, api_key=api_key, max_tokens=1200,  tool_choice="auto",  reasoning_effort="low")
