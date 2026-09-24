@@ -1,62 +1,54 @@
 # World Cup Data-Agent Workshop
 
-This workshop teaches participants to build and improve a SQL data agent over a supplied DuckDB database.
-
-Participants start with a basic agent and progressively add schema inspection, business rules, and executable evaluations to improve answer quality.
-
-## Target environment
-
-The workshop will run in **Amazon SageMaker JupyterLab** using **Amazon Bedrock models**.
-
-SageMaker JupyterLab is required because the workshop uses:
-
-- Local Python modules
-- A local DuckDB database
-- Interactive notebook input
-- Custom HTML rendering for agent traces
-
-## Work before delivery
-
-### Bedrock support
-
-- Ensure model calling is fine through Bedrock. 
-- Select and use a Bedrock model for the workshop. 
-
-### SageMaker environment
-Look into these: 
- - SageMaker Docker image with dependencies preinstalled.
- - SageMaker lifecycle configuration that installs dependencies at startup.
-
-The notebook’s `%pip install` cell should remain only as a fallback.
-
-### Workshop content
-
-- Improve the progression of suggested questions.
-- Make sure the flow works well with one of the bedrock models. 
-- Add evaluation cases covering schema discovery, joins, aggregation, and business rules.
-- Validate expected answers and repeatability with the selected Bedrock model.
-
-## Workshop-ready criteria
-
-The workshop is ready when:
-- A fresh SageMaker JupyterLab environment runs without manual setup.
-- All required files are available automatically.
+This workshop teaches participants to build and improve a SQL data agent over
+a supplied DuckDB database covering 1930–2026. Participants start with a basic
+agent and progressively add schema inspection and business rules to improve
+answer quality.
 
 ## Included files
+
 - `world_cup_data_agent_workshop_final.ipynb` — workshop notebook
-- `worldcup-2026.duckdb` — read-only workshop database
+- `worldcups-1930-2026.duckdb` — read-only workshop database
 - `agent.py` — `smolagents` wrapper
+- `bedrock.py` — hidden Bedrock API-key input and model setup
 - `notebook_ui.py` — agent trace renderer
-- `requirements.txt` — Python dependencies
+- `requirements.lock.txt` — tested workshop dependency versions
+- `scripts/setup_sagemaker.sh` — idempotent environment and kernel setup
+- `scripts/smoke_test.py` — offline environment and data acceptance test
+- `SAGEMAKER.md` — organizer and participant setup guide
 
 Keep the notebook, database, and Python modules in the same directory.
 
+## SageMaker Studio
+
+The delivery target is Amazon SageMaker Studio JupyterLab with Amazon Bedrock.
+The recommended setup uses the stock SageMaker Distribution image and a
+repository-local, pinned Python environment. Follow [SAGEMAKER.md](SAGEMAKER.md)
+to prepare and rehearse participant spaces.
+
 ## Local development
 
-Python 3.12 is recommended.
+Python 3.11 or 3.12 is required.
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 jupyter lab
+```
+
+Select the Python kernel from `.venv`, open
+`world_cup_data_agent_workshop_final.ipynb`, and run the cells in order.
+
+To validate the environment without calling Bedrock:
+
+```bash
+python scripts/smoke_test.py
+```
+
+If `python3` is not the compatible interpreter on your machine, pass it to the
+setup script explicitly, for example:
+
+```bash
+WORKSHOP_PYTHON=/path/to/python3.12 bash scripts/setup_sagemaker.sh
+```
