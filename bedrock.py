@@ -26,4 +26,10 @@ def build_bedrock_model() -> LiteLLMModel:
     os.environ["AWS_REGION_NAME"] = region
 
     print("model:", model_id)
-    return LiteLLMModel(model_id=model_id, api_key=api_key, max_tokens=1200,  tool_choice="auto",  reasoning_effort="low")
+    return LiteLLMModel(
+        model_id=model_id,
+        api_key=api_key,
+        max_tokens=1200,
+        tool_choice="auto",
+        reasoning_effort="low",
+    )
