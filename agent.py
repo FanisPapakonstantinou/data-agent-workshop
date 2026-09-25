@@ -20,6 +20,9 @@ class ToolCallingAgent(_ToolCallingAgent):
         # The notebook has its own live trace renderer. Disable smolagents'
         # Rich console renderer completely so steps are never shown twice.
         kwargs["verbosity_level"] = LogLevel.OFF
+        # All workshop tools share one read-only DuckDB connection. Models may
+        # request several tool calls together, so execute them serially.
+        kwargs.setdefault("max_tool_threads", 1)
         participant_instructions = (instructions or "").strip()
         combined_instructions = "\n\n".join(
             part for part in (participant_instructions, _HARNESS_INSTRUCTIONS) if part

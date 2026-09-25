@@ -3,7 +3,10 @@
 This workshop teaches participants to build and improve a SQL data agent over
 a supplied DuckDB database covering 1930–2026. Participants start with a basic
 agent and progressively add schema inspection and business rules to improve
-answer quality.
+answer quality. The final section turns those examples into a reusable eval
+suite that holds the tools and prompt constant while comparing Haiku 4.5,
+Sonnet 4.5, and Sonnet 4.6 on quality, steps, latency, tokens, and cost. Opus
+4.5 judges each answer against a reference answer.
 
 ## Included files
 
@@ -11,6 +14,7 @@ answer quality.
 - `worldcups-1930-2026.duckdb` — read-only workshop database
 - `agent.py` — `smolagents` wrapper
 - `bedrock.py` — hidden Bedrock API-key input and model setup
+- `evaluation.py` — LLM-as-judge evaluation and comparison harness
 - `notebook_ui.py` — agent trace renderer
 - `requirements.lock.txt` — tested workshop dependency versions
 - `scripts/setup_sagemaker.sh` — idempotent environment and kernel setup

@@ -54,12 +54,17 @@ def main() -> None:
     sys.path.insert(0, str(REPO_ROOT))
     importlib.import_module("agent")
     bedrock = importlib.import_module("bedrock")
+    evaluation = importlib.import_module("evaluation")
     importlib.import_module("notebook_ui")
 
     if not bedrock.DEFAULT_MODEL.startswith("bedrock/"):
         raise RuntimeError("The default model must use LiteLLM's bedrock/ prefix.")
     if not bedrock.DEFAULT_REGION:
         raise RuntimeError("The default AWS region is empty.")
+    if not evaluation.DEFAULT_JUDGE_MODEL.startswith("bedrock/"):
+        raise RuntimeError("The judge model must use the bedrock/ prefix.")
+    if len(evaluation.DEFAULT_CANDIDATE_MODELS) < 2:
+        raise RuntimeError("The eval must compare at least two candidate models.")
     if not DATABASE.is_file():
         raise FileNotFoundError(f"Missing workshop database: {DATABASE}")
 
@@ -67,6 +72,51 @@ def main() -> None:
     with duckdb.connect(str(DATABASE), read_only=True) as connection:
         tables = {row[0] for row in connection.execute("SHOW TABLES").fetchall()}
         match_count = connection.execute("SELECT count(*) FROM matches").fetchone()[0]
+        career_leaders = connection.execute(
+            """
+            WITH careers AS (
+                SELECT p.player_name, t.team_name,
+                       count(DISTINCT m.tournament_id) AS tournaments
+                FROM lineups l
+                JOIN matches m USING (match_id)
+                JOIN players p USING (player_id)
+                JOIN teams t ON p.team_id = t.team_id
+                GROUP BY p.player_name, t.team_name
+            )
+            SELECT player_name, team_name, tournaments
+            FROM careers
+            WHERE tournaments = (SELECT max(tournaments) FROM careers)
+            ORDER BY player_name
+            """
+        ).fetchall()
+        booking_leader = connection.execute(
+            """
+            WITH tournament_matches AS (
+                SELECT match_id
+                FROM matches
+                JOIN tournaments USING (tournament_id)
+                WHERE season = 2022
+            ),
+            booking_totals AS (
+                SELECT b.team_id, count(*) AS bookings
+                FROM bookings b
+                JOIN tournament_matches USING (match_id)
+                GROUP BY b.team_id
+            ),
+            goal_totals AS (
+                SELECT g.credited_team_id AS team_id, count(*) AS goals
+                FROM goals g
+                JOIN tournament_matches USING (match_id)
+                GROUP BY g.credited_team_id
+            )
+            SELECT t.team_name, b.bookings, coalesce(g.goals, 0)
+            FROM booking_totals b
+            JOIN teams t USING (team_id)
+            LEFT JOIN goal_totals g USING (team_id)
+            ORDER BY b.bookings DESC, t.team_name
+            LIMIT 1
+            """
+        ).fetchone()
 
     if tables != EXPECTED_TABLES:
         missing = sorted(EXPECTED_TABLES - tables)
@@ -76,11 +126,20 @@ def main() -> None:
         )
     if match_count <= 0:
         raise RuntimeError("The matches table is empty.")
+    expected_career_leaders = [
+        ("CRISTIANO RONALDO", "Portugal", 6),
+        ("Lionel MESSI", "Argentina", 6),
+    ]
+    if career_leaders != expected_career_leaders:
+        raise RuntimeError(f"Eval reference changed: career leaders={career_leaders}")
+    if booking_leader != ("Argentina", 17, 15):
+        raise RuntimeError(f"Eval reference changed: booking leader={booking_leader}")
 
     print(
         "SMOKE_TEST_OK "
         f"python={sys.version.split()[0]} tables={len(tables)} matches={match_count} "
-        f"region={bedrock.DEFAULT_REGION} model={bedrock.DEFAULT_MODEL}"
+        f"eval_references=2 region={bedrock.DEFAULT_REGION} "
+        f"model={bedrock.DEFAULT_MODEL}"
     )
 
 

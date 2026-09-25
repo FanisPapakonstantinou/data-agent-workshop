@@ -10,7 +10,8 @@ for the first delivery.
 - Region: `eu-north-1`
 - Python: 3.11 or 3.12
 - Kernel shown to participants: **Data Agent Workshop**
-- LiteLLM model ID: `bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0`
+- Eval candidates: Haiku 4.5, Sonnet 4.5, and Sonnet 4.6
+- Eval judge: `bedrock/eu.anthropic.claude-opus-4-5-20251101-v1:0`
 - Data: keep `worldcups-1930-2026.duckdb` in the repository
 
 The database is about 3 MB. Keeping it with the notebook removes an S3
@@ -72,7 +73,8 @@ reach the Python package index during preparation.
 Before the rehearsal, confirm all of the following in the workshop AWS account:
 
 - First-time Anthropic model access requirements have been completed.
-- The selected inference profile can be invoked in `eu-north-1`.
+- The Haiku 4.5, Sonnet 4.5, Sonnet 4.6, and Opus 4.5 inference profiles can
+  all be invoked in `eu-north-1`.
 - API keys will still be valid during the workshop and can invoke
   `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` as needed.
 - The planned number of concurrent participants fits the account's Bedrock
