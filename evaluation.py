@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 from dataclasses import dataclass
 from typing import Any, Iterator, Mapping
@@ -13,6 +12,8 @@ import pandas as pd
 from IPython.display import display
 from litellm import completion_cost, cost_per_token
 from smolagents import LiteLLMModel
+
+from bedrock import configure_bedrock_iam
 
 
 DEFAULT_JUDGE_MODEL = "bedrock/eu.anthropic.claude-opus-4-5-20251101-v1:0"
@@ -53,7 +54,9 @@ class BedrockJudge:
     def __init__(self, model_id: str, region: str, max_tokens: int = 700) -> None:
         self.model_id = model_id
         self.max_tokens = max_tokens
-        self.client = boto3.client("bedrock-runtime", region_name=region)
+        self.client = boto3.client(
+            "bedrock-runtime", region_name=configure_bedrock_iam(region)
+        )
 
     def generate(self, messages: list[dict[str, str]]) -> _JudgeMessage:
         prompt = "\n".join(str(message["content"]) for message in messages)
@@ -86,12 +89,8 @@ class BedrockJudge:
 def build_bedrock_judge(
     model_id: str = DEFAULT_JUDGE_MODEL,
 ) -> BedrockJudge:
-    """Build a deterministic judge using the Bedrock key already entered."""
-    api_key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
-    if not api_key:
-        raise ValueError("Run build_bedrock_model() before creating the judge.")
-
-    region = os.environ.get("AWS_REGION_NAME", "eu-north-1")
+    """Build a judge using AWS IAM credentials."""
+    region = configure_bedrock_iam()
     print("judge:", model_id)
     return BedrockJudge(model_id=model_id, region=region)
 
@@ -99,15 +98,14 @@ def build_bedrock_judge(
 def build_candidate_models(
     model_ids: Mapping[str, str] = DEFAULT_CANDIDATE_MODELS,
 ) -> dict[str, LiteLLMModel]:
-    """Build candidate models with identical generation settings."""
-    api_key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
-    if not api_key:
-        raise ValueError("Run build_bedrock_model() before creating candidates.")
+    """Build candidate models with AWS IAM and identical generation settings."""
+    region = configure_bedrock_iam()
 
     return {
         name: LiteLLMModel(
             model_id=model_id,
-            api_key=api_key,
+            api_key=None,
+            aws_region_name=region,
             max_tokens=1200,
             tool_choice="auto",
             reasoning_effort="low",

@@ -13,7 +13,7 @@ Sonnet 4.5, and Sonnet 4.6 on quality, steps, latency, tokens, and cost. Opus
 - `world_cup_data_agent_workshop_final.ipynb` — workshop notebook
 - `worldcups-1930-2026.duckdb` — read-only workshop database
 - `agent.py` — `smolagents` wrapper
-- `bedrock.py` — hidden Bedrock API-key input and model setup
+- `bedrock.py` — AWS IAM execution-role authentication and model setup
 - `evaluation.py` — LLM-as-judge evaluation and comparison harness
 - `notebook_ui.py` — agent trace renderer
 - `requirements.lock.txt` — tested workshop dependency versions
