@@ -53,10 +53,37 @@ class BrokenJudge:
 
 
 class EvalSuiteTest(unittest.TestCase):
+    def test_model_uses_iam_and_clears_previous_bearer_token(self) -> None:
+        with (
+            patch.dict(os.environ, {"AWS_BEARER_TOKEN_BEDROCK": "old-key"}),
+            patch("builtins.input", side_effect=["eu-west-1", ""]) as prompt,
+            patch("bedrock.LiteLLMModel") as model_class,
+        ):
+            bedrock.build_bedrock_model()
+            self.assertNotIn("AWS_BEARER_TOKEN_BEDROCK", os.environ)
+            self.assertEqual(os.environ["AWS_REGION_NAME"], "eu-west-1")
+
+        self.assertEqual(prompt.call_count, 2)
+        self.assertFalse(any("key" in call.args[0].lower() for call in prompt.call_args_list))
+        self.assertIsNone(model_class.call_args.kwargs["api_key"])
+        self.assertEqual(model_class.call_args.kwargs["aws_region_name"], "eu-west-1")
+
+    def test_eval_models_accept_iam_without_a_bearer_token(self) -> None:
+        with (
+            patch.dict(os.environ, {"AWS_REGION_NAME": "eu-north-1"}, clear=True),
+            patch("evaluation.LiteLLMModel") as model_class,
+            patch("evaluation.boto3.client") as client,
+        ):
+            build_candidate_models({"haiku": bedrock.DEFAULT_MODEL})
+            build_bedrock_judge()
+
+        self.assertIsNone(model_class.call_args.kwargs["api_key"])
+        self.assertEqual(model_class.call_args.kwargs["aws_region_name"], "eu-north-1")
+        client.assert_called_once_with("bedrock-runtime", region_name="eu-north-1")
+
     def test_primary_bedrock_model_does_not_rewrite_messages(self) -> None:
         with (
             patch.dict(os.environ, {}, clear=False),
-            patch("bedrock.getpass.getpass", return_value="test-key"),
             patch("builtins.input", side_effect=["", ""]),
             patch("bedrock.LiteLLMModel") as model_class,
         ):
@@ -91,6 +118,7 @@ class EvalSuiteTest(unittest.TestCase):
                 "usage": {"inputTokens": 50, "outputTokens": 10},
             }
             judge = build_bedrock_judge()
+            self.assertNotIn("AWS_BEARER_TOKEN_BEDROCK", os.environ)
             response = judge.generate([{"role": "user", "content": "Judge this"}])
 
         client.assert_called_once_with("bedrock-runtime", region_name="eu-north-1")
@@ -115,10 +143,12 @@ class EvalSuiteTest(unittest.TestCase):
             patch("evaluation.LiteLLMModel") as model_class,
         ):
             candidates = build_candidate_models(model_ids)
+            self.assertNotIn("AWS_BEARER_TOKEN_BEDROCK", os.environ)
 
         self.assertEqual(list(candidates), ["small", "large"])
         self.assertEqual(model_class.call_count, 2)
         for call in model_class.call_args_list:
+            self.assertIsNone(call.kwargs["api_key"])
             self.assertEqual(call.kwargs["max_tokens"], 1200)
             self.assertEqual(call.kwargs["tool_choice"], "auto")
             self.assertEqual(call.kwargs["reasoning_effort"], "low")

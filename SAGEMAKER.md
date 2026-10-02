@@ -39,7 +39,8 @@ download and permissions dependency from every participant session.
 5. Start or restart JupyterLab, open
    `world_cup_data_agent_workshop_final.ipynb`, and select the
    **Data Agent Workshop** kernel.
-6. Run the notebook from top to bottom with a fresh Bedrock API key.
+6. Run the notebook from top to bottom. It uses the Studio execution role
+   automatically; no Bedrock API key is required or requested.
 
 The setup script is idempotent. It reinstalls dependencies only when
 `requirements.lock.txt` changes, registers the kernel, and runs an offline
@@ -75,15 +76,20 @@ Before the rehearsal, confirm all of the following in the workshop AWS account:
 - First-time Anthropic model access requirements have been completed.
 - The Haiku 4.5, Sonnet 4.5, Sonnet 4.6, and Opus 4.5 inference profiles can
   all be invoked in `eu-north-1`.
-- API keys will still be valid during the workshop and can invoke
-  `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` as needed.
+- The Studio execution role can invoke `bedrock:InvokeModel` and
+  `bedrock:InvokeModelWithResponseStream` on the inference profiles and their
+  underlying models in the destination regions.
 - The planned number of concurrent participants fits the account's Bedrock
   quotas.
-- Each participant has an individual key when possible. Never commit keys to
-  Git or save them in notebook output, and rotate the workshop keys afterward.
+- Each participant uses their own Studio user profile and private space with
+  an appropriately scoped execution role.
 
-The notebook asks for the API key with hidden input and keeps it only in the
-kernel process environment.
+The notebook uses the normal AWS credential chain, including the temporary
+credentials of the Studio execution role. Candidates and the judge use the
+same authentication without copying or storing credentials. Each model builder
+clears `AWS_BEARER_TOKEN_BEDROCK` from the kernel environment so a key left by
+an earlier notebook run cannot override IAM authentication. For local use,
+configure an AWS CLI profile or export temporary AWS credentials beforehand.
 
 ## Acceptance test
 
@@ -107,8 +113,8 @@ final rehearsal.
 2. Open `world_cup_data_agent_workshop_final.ipynb`.
 3. Confirm that the **Data Agent Workshop** kernel is selected.
 4. Run the cells in order.
-5. Paste the supplied Bedrock API key into the hidden prompt and press Enter.
-6. Press Enter at the region and model prompts to accept the tested defaults.
+5. Press Enter at the region and model prompts to accept the tested defaults.
+   Authentication uses the Studio execution role automatically.
 
 ## AWS references
 
