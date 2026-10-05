@@ -87,18 +87,21 @@ _STYLES = """
   content: "SQL"; position: absolute; top: 15px; left: 13px;
   color: #2563eb; font-size: 10px; font-weight: 800; letter-spacing: .08em;
 }
-.agent-sql pre {
+.agent-run .agent-sql pre {
   margin: 0 !important; padding: 0 !important; border: 0 !important;
-  color: #334155; background: transparent !important;
+  color: #334155 !important; background: transparent !important;
   font: 12.5px/1.65 ui-monospace, SFMono-Regular,
     Menlo, Monaco, Consolas, "Liberation Mono", monospace; white-space: pre;
 }
-.agent-sql .k, .agent-sql .kn { color: #6d28d9; font-weight: 750; }
-.agent-sql .nf, .agent-sql .nb { color: #0369a1; font-weight: 650; }
-.agent-sql .s1, .agent-sql .s2 { color: #15803d; }
-.agent-sql .mi, .agent-sql .mf { color: #b45309; }
-.agent-sql .o, .agent-sql .p { color: #475569; }
-.agent-sql .c1, .agent-sql .cm { color: #64748b; font-style: italic; }
+/* Jupyter's dark theme colors Pygments spans globally. Keep SQL tokens
+   readable against this panel's fixed light background in either theme. */
+.agent-run .agent-sql pre span { color: #334155 !important; }
+.agent-run .agent-sql pre .k, .agent-run .agent-sql pre .kn { color: #6d28d9 !important; font-weight: 750; }
+.agent-run .agent-sql pre .nf, .agent-run .agent-sql pre .nb { color: #0369a1 !important; font-weight: 650; }
+.agent-run .agent-sql pre .s1, .agent-run .agent-sql pre .s2 { color: #15803d !important; }
+.agent-run .agent-sql pre .mi, .agent-run .agent-sql pre .mf { color: #b45309 !important; }
+.agent-run .agent-sql pre .o, .agent-run .agent-sql pre .p { color: #475569 !important; }
+.agent-run .agent-sql pre .c1, .agent-run .agent-sql pre .cm { color: #64748b !important; font-style: italic; }
 .agent-result summary {
   cursor: pointer; list-style: none; padding: 10px 13px; color: #475569;
   font-size: 12px; font-weight: 700; user-select: none;
